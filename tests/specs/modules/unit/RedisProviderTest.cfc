@@ -80,8 +80,9 @@ component extends="coldbox.system.testing.BaseTestCase"{
 			
 		testVal = {name="luis", age=32};
 		cache.set( "unittestkey", testVal );
-		
+		sleep( 2 );	
 		results = cache.get( 'unittestkey' );
+		assertTrue( !isNull( results ) );
 		assertEquals( testVal, results );
 	}
 	
@@ -97,6 +98,7 @@ component extends="coldbox.system.testing.BaseTestCase"{
 		RedisClient.set( "unitTestKey", 'Testing' );
 		cache.returnToPool( RedisClient );
 		cache.expireObject( "unitTestKey" );
+		sleep( 2 );
 		results = cache.get( 'unitTestKey' );
 		assertTrue( isNull( results ) );
 	}

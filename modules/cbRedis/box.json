@@ -1,22 +1,20 @@
 {
-    "name"              : "Redis Couchbase Provider Module for Coldbox",
+    "name"              : "Redis Provider Module for Coldbox",
     "version"           : "1.0.0",
     "author"            : "Jon Clausen <jon_clausen@silowebworks.com>",
-    "slug"              : "couchbase-provider",
+    "slug"              : "cbredis",
     "type"              : "modules",
-    "homepage"          : "http://wiki.coldbox.org/wiki/CacheBox-Couchbase.cfm",
-    "documentation"     : "http://wiki.coldbox.org/wiki/CacheBox-Couchbase.cfm",
-    "repository"        : { "type" : "git", "url" : "https://github.com/ColdBox/cachebox-couchbase" },
-    "shortDescription"  : "Allows for the use of Couchbase as a Cachebox provider",
+    "homepage"          : "https://github.com/jclausen/cbRedis",
+    "documentation"     : "https://github.com/jclausen/cbRedis/wiki",
+    "repository"        : { "type" : "git", "url" : "https://github.com/jclausen/cbRedis" },
+    "shortDescription"  : "Allows for the use of Redis as a Cachebox provider",
     "license"           : [ 
         { 
             "type" : "Apache2", 
             "url" : "http://www.apache.org/licenses/LICENSE-2.0.html" 
         } 
     ],
-    "contributors"      : [
-        "Aaron Greenlee"
-    ],
+    "contributors"      : [],
     "engines"   : [
         { "type" : "railo", "version" : ">4.1" },
         { "type" : "adobe", "version" : ">9.02" },

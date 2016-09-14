@@ -1,1 +1,1 @@
-<cfoutput>Hola!</cfoutput>
+<cfoutput>cbRedis is up and running!</cfoutput>

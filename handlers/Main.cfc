@@ -8,23 +8,8 @@ component accessors=true{
 	any function index( event, rc, prc ){
 
 		var cache = getCachebox().getCache("template");
+		var cache.set( "foo", "bar" );
 		
-		var bar = ["bar"];
-
-		var future = cache.set( "foo", bar );
-
-		var foo2 = cache.get( "foo" );
-
-
-		arrayAppend( foo2, "bar2" );
-
-		cache.set( "foo", foo2 );
-
-		writeDump(var=cache.get("foo") );
-		abort;
-
-		//writeDump(var=getCachebox().getCache("template").getMemcachedClient(),top=1);
-		abort;
 		event.setView( "main/index" );
 	}
 

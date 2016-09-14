@@ -1,7 +1,7 @@
 {
     "name":"cbRedis",
     "version":"1.0.0",
-    "slug":"module-template",
+    "slug":"cbredis",
     "private":false,
     "dependencies":{
         "coldbox":"4.2.0+00002",
