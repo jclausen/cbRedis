@@ -20,7 +20,7 @@ install:
   - wget http://download.redis.io/redis-stable.tar.gz
   - tar -xzvf redis-stable.tar.gz
   - cd redis-stable && make && make test && sudo make install
-  - sudo redis-server
+  - sudo redis-server --daemonize yes
   - redis-cli --version
   #Commandbox setup
   - box install
