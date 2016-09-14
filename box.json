@@ -14,5 +14,12 @@
         "coldbox":"coldbox",
         "testbox":"testbox",
         "cbjavaloader":"modules/cbjavaloader"
+    },
+    "testbox"           : {
+        "runner" : [
+            {
+                "default":"http://localhost:49616/tests/runner.cfm"
+            }
+        ]
     }
 }
