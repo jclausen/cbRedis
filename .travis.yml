@@ -1,0 +1,61 @@
+language: java
+sudo: required
+dist: trusty
+
+env:
+  global:
+    - RELEASE_VERSION="1.0.0"
+    - RELEASE_PLACEHOLDER="@release.number@"
+    - BUILD_PLACEHOLDER="@build.number@"
+
+before_install:
+  - sudo apt-key adv --keyserver keys.gnupg.net --recv 6DA70622
+  - sudo echo "deb http://downloads.ortussolutions.com/debs/noarch /" | sudo tee -a /etc/apt/sources.list.d/commandbox.list
+  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+  - sudo echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee -a /etc/apt/sources.list.d/mongodb-org-3.2.list
+
+install:
+  # MongoDB Manual Install - Travis' is still at 2.6
+  - sudo apt-get update && sudo apt-get --assume-yes install wget zip unzip commandbox
+  - wget http://download.redis.io/redis-stable.tar.gz
+  - tar -xzvf redis-stable.tar.gz
+  - cd redis-stable && make && make test && sudo make install
+  - sudo systemctl start redis
+  - redis-cli --version
+  #Commandbox setup
+  - box install
+  - box server start port=49616 rewritesEnable=false openBrowser=false
+
+before_script:
+  - curl http://localhost:49616/
+
+script: > 
+    testResults="echo $(box testbox run)";
+    echo "$testResults";
+    if grep -i "\[Failures: [1-9][0-9]\?[0-9]\?\]\|\[Errors: [1-9][0-9]\?[0-9]\?\]\|<t[^>]*>\|<b[^>]*>" <<< $testResults;  then exit 1; fi
+
+after_success:
+  - sudo sed -i "s/$RELEASE_PLACEHOLDER/${RELEASE_VERSION}/g;" 'modules/cbredis/box.json'
+  - sleep 2
+  - sudo sed -i "s/$BUILD_PLACEHOLDER/${TRAVIS_BUILD_NUMBER}/g" 'modules/cbredis/box.json'
+  - sleep 2
+
+before_deploy:
+  - mkdir deploy
+  - cp README.md modules/cbredis/  && cp LICENSE modules/cbredis
+  - cd modules/cbredis && sudo zip -r "../../deploy/cbredis-$TRAVIS_BRANCH-v$RELEASE_VERSION+$TRAVIS_BUILD_NUMBER.zip" ./* && cd ../../
+  - cp "deploy/cbredis-$TRAVIS_BRANCH-v$RELEASE_VERSION+$TRAVIS_BUILD_NUMBER.zip" "deploy/cbredis-$TRAVIS_BRANCH-latest.zip"
+
+deploy:
+  on:
+    branch: 
+      - master
+      - development
+  skip_cleanup: true
+  provider: s3
+  #AWS Credentials need to be set in Travis
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_ACCESS_SECRET
+  bucket: "oss.silowebworks.com"
+  local-dir: deploy
+  acl: public_read
