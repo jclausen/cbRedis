@@ -1,9 +1,11 @@
 {
-    "force":true,
-    "openbrowser":"false",
     "web":{
         "http":{
             "port":"49616"
+        },
+        "rewrites":{
+            "enabled":"false"
         }
-    }
+    },
+    "openbrowser":"false"
 }
