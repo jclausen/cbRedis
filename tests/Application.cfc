@@ -14,7 +14,7 @@ component{
 	rootPath = REReplaceNoCase( this.mappings[ "/tests" ], "tests(\\|/)", "" );
 	this.mappings[ "/root" ]   		= rootPath;
 	this.mappings[ "/cbjavaloader" ]  = rootPath & "/modules/cbjavaloader";
-	this.mappings[ "/RedisProvider" ]  = rootPath & "/modules/cbRedis";
+	this.mappings[ "/RedisProvider" ]  = rootPath & "/modules/cbredis";
 
 	// request start
 	public boolean function onRequestStart( String targetPage ){	
