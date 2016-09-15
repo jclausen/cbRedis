@@ -22,6 +22,7 @@ install:
   - cd redis-stable && make && make test && sudo make install
   - sudo redis-server --daemonize yes
   - redis-cli --version
+  - cd ../
   #Commandbox setup
   - box install
   - box server start port=49616 rewritesEnable=false openBrowser=false
