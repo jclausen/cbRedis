@@ -1,11 +1,15 @@
 <?xml version="1.0"?>
 <project name="build" basedir="../" default="build">
 	<!-- Version: UPDATE ON EACH RELEASE AS NEEDED -->
-	<property name="project.name" 		value="cbModule" />
-	<property name="module.name" 		value="cbModule" />
+	<property name="project.name" 		value="cbredis" />
+	<property name="module.name" 		value="cbredis" />
 	<property name="project.version" 	value="1.0.0"/>
-	<property name="groupID" 			value="yourcompany" />
-	
+	<property name="groupID" 			value="silowebworks" />
+
+	<condition property="isTravis" else="false">
+      <isset property="isTravis"/>
+    </condition>
+
 	<!-- Build Labels -->
 	<tstamp prefix="start"/>
 	<path id="cp">
@@ -15,8 +19,6 @@
 	</path>
 	<!-- Define Tasks -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="cp" />
-	<!-- Import Box-Repo Tasks -->
-	<import><url url="https://raw.githubusercontent.com/Ortus-Solutions/box-tasks/master/box-repo.xml"/></import>
 	
 	<!-- Init -->
 	<target name="init" description="Init Build" unless="src.isInit">
@@ -44,6 +46,7 @@
 					pattern="00000"
 			     	default="1" />
 		</propertyfile>
+
 		<property file="workbench/build.number"/>
 		
 		<!-- Build Label -->
@@ -59,7 +62,8 @@
 	</target>
 	
 	<!-- Build Project -->
-	<target name="build" depends="init,run-tests,run-docker-tests" description="Build the project">
+	<!-- NOTE:  Add run-alt-engine-tests back to `depends` attribute once COMMANDBOX-448 fix is in the current release -->
+	<target name="build" depends="init,run-tests" description="Build the project">
 		<!-- Copy build ID -->
 		<concat destfile="${dir.build}/${build.label}">Built on ${start.TODAY}</concat>
 		
@@ -69,6 +73,8 @@
         </copy>
         <!-- Copy readme -->
         <copy todir="${dir.build}" encoding="UTF-8" file="readme.md" overwrite="true" />
+        <copy todir="${dir.build}" encoding="UTF-8" file="changelog.md" overwrite="true" />
+        <copy todir="${dir.build}" encoding="UTF-8" file="instructions.md" overwrite="true" />
         
         <!-- Replace Version + Build Numbers -->
 		<replaceregexp match='@build.version@' replace="${project.version}" flags="ig" byline="true" encoding="UTF-8">
@@ -81,7 +87,7 @@
 		<!-- Api Docs -->
 		<antcall target="build.apidocs" />
         
-        <!-- Zip Project -->
+        <!-- Zip it -->
 		<zip destfile="${dir.exports}/${project.name}-${project.version}.zip" basedir="${dir.build}"></zip>
 		
 		<!-- Build Checksums -->
@@ -95,19 +101,16 @@
 				<include name="*.zip" />
 			</fileset>
 		</checksum>
-		
-		<!-- Create Box Repo From macrodef -->
-		<box-repo location="${dir.artifacts}/${project.name}" 
-				  artifactID="${project.name}" 
-				  buildID="${build.number}"
-				  groupID="${groupID}"
-				  latest="${project.version}"
-				  classifiers="apidocs"/>
 				  
-		<!-- Cleanup -->
-		<delete dir="${dir.build}" />
+		<!-- Cleanup -->	
+		<if>
+			<equals arg1="$isTravis" arg2="false" />
+			<then>
+				<delete dir="${dir.build}" />
+			</then>
+		</if>
 	</target>
-	
+
 	<!-- Build API Docs -->
  	<target name="build.apidocs" description="Builds the api docs" depends="init">
  		<!-- Create API apidocs dir -->
@@ -130,59 +133,80 @@
 		<exec executable="box" dir="${dir.apidocs}">
 			<arg line="server stop" />
 		</exec>
+		<delete file="${dir.build}/docbox.html" />
 		<!-- Zip API Docs -->
 		<zip destfile="${dir.exports}/${project.name}-apidocs-${project.version}.zip" basedir="${dir.api}"></zip>
  	</target>
 	
 	<!-- Run Tests For Platform -->
     <target name="run-tests" description="Run TestBox Tests" depends="init">
+    	<!-- Start our default Commandbox server ( L4.5 ) -->
+		<exec executable="box" dir="${basedir}">
+			<arg line="server start" />
+		</exec>
+
     	<echo>Running Tests for ${project.name}</echo>
+    	
     	<!-- Determine Test target: Are we jenkins or local or travis -->
-        <if>
-			<not><equals arg1="${environment}" arg2="auto" /></not>
-			<then>
-				<property name="test.target" value="run" />
-			</then>
-			<else>
-				<property name="test.target" value="run-junit" />
-			</else>
-		</if>
-    	<!-- Run for Core -->
+        
+		<property name="test.target" value="run" />
+		
+    	<!-- Run the tests against the default server -->
     	<subant target="${test.target}">
           	<fileset dir="tests" includes="test.xml"/>
     		<property name="environment" value="${environment}" />
         </subant>
+
+        <!-- Stop the default server -->
+        <exec executable="box" dir="${basedir}">
+			<arg line="server stop" />
+		</exec>
     </target>
 
-     <!-- Test for Docker Availability -->
-    <property environment="env" /> 
-	<available file="docker-compose" filepath="${env.PATH}" property="docker.present"/>
 
 	<!-- Docker Tests for Different Engines -->
-    <target name="run-docker-tests" description="Run Docker Container Tests" depends="init" if="docker.present">
-		
-		<!-- Lucee 5 Tests -->
-		<property name="test.targetL5" value="runLucee5" />
-		<subant target="${test.targetL5}">
+    <target name="run-alt-engine-tests" description="Run Docker Container Tests" if="isTravis">
+ 		<foreach param="engine" list="lucee5,acf11,acf2016" target="run-alt-engine-test" />
+    </target>
+
+    <target name="run-alt-engine-test" description="In-loop runner for engine tests">
+    	
+    	<property name="serverName" value="${engine}"/>
+
+    	<echo>========= Running CFEngine Tests for: ${engine} ==============</echo>
+
+    	<antcall target="startServer" inheritRefs="true" />
+
+		<subant target="runEngine">
           	<fileset dir="tests" includes="test.xml"/>
+    		<property name="engine" value="${engine}" />
     		<property name="environment" value="${environment}" />
         </subant>
 
-        <!-- ACF11 -->
-        <property name="test.targetACF11" value="runACF11" />
-		<subant target="${test.targetACF11}">
-          	<fileset dir="tests" includes="test.xml"/>
-    		<property name="environment" value="${environment}" />
-        </subant>
+ 		<antcall target="stopServer" inheritRefs="true" />
 
-
+        <echo>========= CFEngine Tests for ${engine} completed. ==============</echo>
+    	
     </target>
     
     <!-- Get Dependencies -->
-	<target name="getDependencies" description="Get all the necessary dependencies for the build process">
+	<target name="getDependencies" description="Get all the necessary dependencies for the build process using: box.repo.url">
 		<!-- Install dependencies for project -->
 		<exec executable="box" dir="${basedir}">
 			<arg line="install" />
+		</exec>
+	</target>
+
+
+	<target name="startServer" description="Starts a single server">
+		<exec executable="box" dir="${basedir}">
+			<arg line="server start name=${serverName} directory=${basedir} serverConfigFile=${basedir}/workbench/servers/server-${serverName}.json" />
+		</exec>
+	</target>
+
+	<target name="stopServer" description="Stops a single server">
+		<exec executable="box" dir="${basedir}">
+			<arg line="server stop name=${serverName} directory=${basedir} serverConfigFile=${basedir}/workbench/servers/server-${serverName}.json" />
 		</exec>
 	</target>
 

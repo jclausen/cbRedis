@@ -1,23 +1,26 @@
 {
-    "name"              : "Redis Provider Module for Coldbox",
-    "version"           : "1.0.0",
+    "name"              : "cbRedis",
+    "version"           : "@build.version@+@build.number@",
     "author"            : "Jon Clausen <jon_clausen@silowebworks.com>",
     "slug"              : "cbredis",
     "type"              : "modules",
+    "location"          : "http://oss.silowebworks.com.s3.amazonaws.com/coldbox-modules/cbredis/@build.version@/cbredis-@build.version@.zip",
     "homepage"          : "https://github.com/jclausen/cbRedis",
     "documentation"     : "https://github.com/jclausen/cbRedis/wiki",
     "repository"        : { "type" : "git", "url" : "https://github.com/jclausen/cbRedis" },
-    "shortDescription"  : "Allows for the use of Redis as a Cachebox provider",
+    "shortDescription"  : "Memcached Provider Module for Coldbox/Cachebox",
     "license"           : [ 
         { 
             "type" : "Apache2", 
             "url" : "http://www.apache.org/licenses/LICENSE-2.0.html" 
         } 
     ],
-    "contributors"      : [],
+    "contributors"      : [
+        "Aaron Greenlee"
+    ],
     "engines"   : [
         { "type" : "railo", "version" : ">4.1" },
-        { "type" : "adobe", "version" : ">9.02" },
+        { "type" : "adobe", "version" : ">9.02" }
     ],
     "dependencies"  :{
         "cbjavaloader" : ">=1.0.0"
