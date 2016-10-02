@@ -109,6 +109,11 @@ component{
 				 {
 					provider : 'modules.cbRedis.models.RedisColdboxProvider'
 				    ,properties : {}
+				},
+				"integration-tests" :
+				 {
+					provider : 'modules.cbRedis.models.RedisColdboxProvider'
+				    ,properties : {}
 				}
 	        },        
 	        // Register all event listeners here, they are created in the specified order
