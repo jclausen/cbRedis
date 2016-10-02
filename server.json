@@ -1,5 +1,5 @@
 {
-    "name":"memcached",
+    "name":"cbredis",
     "force":true,
     "web":{
         "http":{

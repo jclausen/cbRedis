@@ -37,7 +37,7 @@ component extends="coldbox.system.testing.BaseTestCase"{
 	    };
 		
 		// Create Provider
-		cache = getMockBox().createMock("RedisProvider.models.RedisProvider").init();
+		cache = getMockBox().createMock("cbredis.models.RedisProvider").init();
 		// Decorate it
 		cache.setConfiguration( config );
 		cache.setCacheFactory( mockFactory );

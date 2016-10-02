@@ -42,7 +42,7 @@ component extends="RedisProviderTest"{
 		
 		// Create Provider
 		// Find a way to make the "RedisApp" mapping dynamic for people (like Brad) running this in the root :)
-		cache = getMockBox().createMock("RedisProvider.models.RedisColdboxProvider").init();
+		cache = getMockBox().createMock("cbredis.models.RedisColdboxProvider").init();
 		// Decorate it
 		cache.setConfiguration( config );
 		cache.setCacheFactory( mockFactory );
