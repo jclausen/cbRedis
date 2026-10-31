@@ -1,0 +1,35 @@
+// Native CLI contracts; module lifecycle is exercised by tasks/Test.cfc in a
+// runtime with web scopes. No application server is started by this runner.
+request.cbRedisFixture = {
+	port        : getSystemSetting( "CBREDIS_TEST_PORT" ),
+	tlsPort     : getSystemSetting( "CBREDIS_TEST_TLS_PORT" ),
+	caFile      : getSystemSetting( "CBREDIS_TEST_CA_FILE" ),
+	wrongCaFile : getSystemSetting( "CBREDIS_TEST_WRONG_CA_FILE" )
+};
+if (
+	!isNumeric( request.cbRedisFixture.port ) || !isNumeric( request.cbRedisFixture.tlsPort ) ||
+				request.cbRedisFixture.port < 1024 ||
+			request.cbRedisFixture.tlsPort < 1024 ||
+		request.cbRedisFixture.port == request.cbRedisFixture.tlsPort
+) {
+	throw(
+		message = "Use distinct ephemeral local fixture ports"
+	);
+}
+result = new testbox.system.TestBox( bundles = "tests.specs.modern.RedisSpec" )
+	.runRaw()
+	.getMemento( includeDebugBuffer = true );
+for ( bundle in result.bundleStats ) {
+	for ( suite in bundle.suiteStats ) {
+		for ( spec in suite.specStats ) {
+			println( spec.status & " " & spec.name & ( len( spec.failMessage ) ? ": " & spec.failMessage : "" ) );
+			if ( spec.status == "Error" ) {
+				println( spec.error.message & " " & spec.error.detail );
+			}
+		}
+	}
+}
+println( "Passed: " & result.totalPass & "; failed: " & result.totalFail & "; errors: " & result.totalError );
+if ( result.totalFail || result.totalError || !result.totalPass ) {
+	throw( message = "cbRedis contracts failed" );
+}

@@ -1,25 +1,17 @@
 {
-    "name":"cbRedis",
-    "version":"1.0.0",
-    "slug":"cbredis",
-    "private":false,
-    "dependencies":{
-        "coldbox":"4.2.0+00002",
-        "cbjavaloader":"^1.3.0+00007"
-    },
-    "devDependencies":{
-        "testbox":"2.3.0+00044"
-    },
-    "installPaths":{
-        "coldbox":"coldbox",
-        "testbox":"testbox",
-        "cbjavaloader":"modules/cbjavaloader"
-    },
-    "testbox":{
-        "runner":[
-            {
-                "default":"http://localhost:49616/tests/runner.cfm"
-            }
-        ]
-    }
+    "name": "cbRedis",
+    "slug": "cbredis",
+    "version": "2.0.0-alpha.1",
+    "type": "modules",
+    "author": "Jon Clausen",
+    "shortDescription": "Verified TLS Redis/Valkey connections and CacheBox 8 provider",
+    "homepage": "https://github.com/jclausen/cbRedis",
+    "repository": { "type": "git", "url": "https://github.com/jclausen/cbRedis" },
+    "license": [{ "type": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0" }],
+    "engines": [{ "type": "boxlang", "version": ">=1.0.0" }, { "type": "lucee", "version": ">=6.0.0" }],
+    "dependencies": {},
+    "devDependencies": { "coldbox": "8.0.0", "testbox": "7.2.0" },
+    "installPaths": { "coldbox": "coldbox/", "testbox": "testbox/" },
+    "ignore": [".git/**", ".travis.yml", "Application.cfc", "index.cfm", "TestProxy.cfc", "server.json", "instructions.md", "config/**", "handlers/**", "views/**", "layouts/**", "includes/**", "interceptors/**", "modules/**", "tests/**", "tasks/**", "workbench/**", "coldbox/**", "testbox/**", "apidocs/**", ".tmp/**", "artifacts/**"],
+    "scripts": { "test": "task run tasks/Test" }
 }

@@ -1,0 +1,8 @@
+{
+    "mappings": {
+        "/cbRedis": "${user-dir}",
+        "/coldbox": "${user-dir}/coldbox",
+        "/testbox": "${user-dir}/testbox",
+        "/tests": "${user-dir}/tests"
+    }
+}
